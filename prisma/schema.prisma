@@ -14,7 +14,6 @@ model Company {
   id                   String                @id @default(auto()) @map("_id") @db.ObjectId
   companyName          String
   notifications        UiNotification[]
-  // users                User[]
   notificationChannels NotificationChannel[]
 }
 
@@ -25,8 +24,6 @@ model User {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   notifications        UiNotification[]
-  // company              Company               @relation(fields: [companyId], references: [id])
-  // companyId            String                @db.ObjectId
   notificationChannels NotificationChannel[]
 }
 
