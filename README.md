@@ -73,7 +73,14 @@ npm run start:prod
 ## Test
 
 ```bash
+# run unit tests once
 npm run test
+
+# watch mode
+npm run test:watch
+
+# run end to end tests
+npm run test:e2e
 ```
 
 
