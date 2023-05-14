@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id                   String                @id @default(auto()) @map("_id") @db.ObjectId
+  companyName          String
+  notifications        UiNotification[]
+  // users                User[]
+  notificationChannels NotificationChannel[]
+}
+
+model User {
+  id                   String                @id @default(auto()) @map("_id") @db.ObjectId
+  firstName            String
+  birthDay             DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  notifications        UiNotification[]
+  // company              Company               @relation(fields: [companyId], references: [id])
+  // companyId            String                @db.ObjectId
+  notificationChannels NotificationChannel[]
+}
+
+enum NotificationChannel {
+  EMAIL
+  UI
+}
+
+model NotificationType {
+  id                   String                @id @default(auto()) @map("_id") @db.ObjectId
+  name                 String                @unique
+  notificationChannels NotificationChannel[]
+}
+
+model UiNotification {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  subject String
+  content String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.ObjectId
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @db.ObjectId
+}
