@@ -3,16 +3,24 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { NotificationsService } from '../notifications.service';
 import { NotificationsModule } from '../notifications.module';
 
+import { PrismockClient } from 'prismock';
+import { seedCore } from '../../../prisma/seed-core';
+
 describe('NotificationsService', () => {
   let prisma: PrismaService;
   let service: NotificationsService;
+  const prismock = new PrismockClient();
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [NotificationsModule],
-    }).compile();
+    })
+      .overrideProvider(PrismaService)
+      .useValue(prismock)
+      .compile();
 
     prisma = moduleRef.get(PrismaService);
+    seedCore(prisma);
     service = moduleRef.get(NotificationsService);
   });
 

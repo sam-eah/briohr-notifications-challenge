@@ -1,67 +1,10 @@
-import { NotificationChannel, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { seedCore } from './seed-core';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.company.createMany({
-    data: [
-      {
-        companyName: 'BrioHR Email',
-        notificationChannels: [NotificationChannel.EMAIL],
-      },
-      {
-        companyName: 'BrioHR UI',
-        notificationChannels: [NotificationChannel.UI],
-      },
-      {
-        companyName: 'BrioHR Both',
-        notificationChannels: [
-          NotificationChannel.EMAIL,
-          NotificationChannel.UI,
-        ],
-      },
-    ],
-  });
-
-  await prisma.user.createMany({
-    data: [
-      {
-        firstName: 'User Email',
-        notificationChannels: [NotificationChannel.EMAIL],
-      },
-      {
-        firstName: 'User UI',
-        notificationChannels: [NotificationChannel.UI],
-      },
-      {
-        firstName: 'User Both',
-        notificationChannels: [
-          NotificationChannel.EMAIL,
-          NotificationChannel.UI,
-        ],
-      },
-    ],
-  });
-
-  await prisma.notificationType.createMany({
-    data: [
-      {
-        name: 'leave_balance_reminder',
-        notificationChannels: [NotificationChannel.UI],
-      },
-      {
-        name: 'monthly_payslip',
-        notificationChannels: [NotificationChannel.EMAIL],
-      },
-      {
-        name: 'happy_birthday',
-        notificationChannels: [
-          NotificationChannel.EMAIL,
-          NotificationChannel.UI,
-        ],
-      },
-    ],
-  });
+  await seedCore(prisma);
 
   const companyCount = await prisma.company.count();
   const userCount = await prisma.user.count();
