@@ -17,8 +17,8 @@ describe('AppController (e2e)', () => {
 
   it('/ (GET)', () => {
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .get('/notifications/646118e0f1d213e188c10989')
+      .expect(400)
+      .expect('{"statusCode":400,"message":"user not found"}');
   });
 });
