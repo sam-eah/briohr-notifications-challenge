@@ -70,6 +70,22 @@ npm run start:dev
 npm run start:prod
 ```
 
+Then endpoints available are:
+- GET /notifications/:userId
+- POST /notifications/
+
+using the following body:
+```
+{
+  companyId: "{{companyId}}",
+  userId: "{{userId}}",
+  notificationType: "{{notificationType}}",
+}
+```
+The easiest is to get the companyId, userId and notificationType from the database (after seeding), with prisma studio for example.
+
+There is also a Postman Collection that you can import and set the variables in there.
+
 ## Test
 
 ```bash
@@ -82,5 +98,5 @@ npm run test:watch
 # run end to end tests
 npm run test:e2e
 ```
-
+Important note: some tests will need the seeds from the database (even if the data is mocked) to pass.
 
