@@ -6,19 +6,7 @@ My solution for the BrioHR challenge - The notification microservice
 
 ## Installation
 
-- Install the required node modules
-```bash
-npm install
-```
-
-to make sure nestjs was correctly installed, you can run 
-```bash
-npm run start
-```
-Then go to http://localhost:3000/notifications/646118e0f1d213e188c10989 on your brower and you should see this message:
-`{"statusCode":400,"message":"user not found"}`
-
-- Build the mongoDB docker image 
+- Build and run the mongoDB docker image 
 (For an easier installation - and given there are no sensitive data - I have versioned the .env file)
 ```bash
 docker compose build
@@ -30,6 +18,17 @@ Make sure the container is correctly running, logs should show `REPLICA SET ONLI
  ```
  And then `show dbs`
 
+- Install the required node modules
+```bash
+npm install
+```
+
+to make sure nestjs was correctly installed, you can run 
+```bash
+npm run start
+```
+Then go to http://localhost:3000/notifications/646118e0f1d213e188c10989 on your brower and you should see this message:
+`{"statusCode":400,"message":"user not found"}`
 
 ## Initialize the Database
 
