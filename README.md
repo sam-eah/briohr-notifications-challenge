@@ -70,7 +70,7 @@ npm run start:dev
 npm run start:prod
 ```
 
-Then endpoints available are:
+Endpoints:
 - GET /notifications/:userId
 - POST /notifications/
 
