@@ -58,27 +58,36 @@ export class NotificationsService {
   }
 }
 
-abstract class AbstractNotification {
-  protected prisma: PrismaService;
-  protected user: User;
-  protected company: Company;
-  protected notificationChannel: NotificationChannel;
+interface INotification {
+  prisma: PrismaService;
+  user: User;
+  company: Company;
+  notificationChannel: NotificationChannel;
 
   /** checks if notification should be sent */
-  check() {
-    return (
-      this.user.notificationChannels.includes(this.notificationChannel) &&
-      this.company.notificationChannels.includes(this.notificationChannel)
-    );
-  }
+  check(): boolean;
 
   /** checks if notification should be sent and sends it */
-  send() {}
+  send(): Promise<void>;
+}
+
+abstract class AbstractNotification {
+  prisma: PrismaService;
+  user: User;
+  company: Company;
+  notificationChannel: NotificationChannel;
 
   constructor(prisma: PrismaService, user: User, company: Company) {
     this.prisma = prisma;
     this.user = user;
     this.company = company;
+  }
+
+  check() {
+    return (
+      this.user.notificationChannels.includes(this.notificationChannel) &&
+      this.company.notificationChannels.includes(this.notificationChannel)
+    );
   }
 }
 
@@ -98,7 +107,7 @@ class NotificationFactory {
   }
 }
 
-class UiNotification extends AbstractNotification {
+class UiNotification extends AbstractNotification implements INotification {
   notificationChannel = NotificationChannel.UI;
 
   async send() {
@@ -116,7 +125,7 @@ class UiNotification extends AbstractNotification {
   }
 }
 
-class EmailNotification extends AbstractNotification {
+class EmailNotification extends AbstractNotification implements INotification {
   notificationChannel = NotificationChannel.EMAIL;
 
   async send() {
