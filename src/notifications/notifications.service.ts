@@ -7,34 +7,17 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class NotificationsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUiNotification(user: User, company: Company) {
-    const res = await this.prisma.uiNotification.create({
-      data: {
-        userId: user.id,
-        companyId: company.id,
-        subject: `Happy Birthday ${user.firstName}`,
-        content: `${company.companyName} is wishing you a happy birthday`,
-      },
-    });
-    return res;
-  }
-
-  createEmailNotification(user: User) {
-    console.log(`Happy Birthday ${user.firstName}`);
-  }
-
   async createNotification(createNotificationDto: CreateNotificationDto) {
     const user = await this.prisma.user.findFirst({
       where: { id: createNotificationDto.userId },
     });
-    console.log(user);
     if (!user)
       throw new HttpException('user not found', HttpStatus.BAD_REQUEST);
 
     const company = await this.prisma.company.findFirst({
       where: { id: createNotificationDto.companyId },
     });
-    if (!user)
+    if (!company)
       throw new HttpException('company not found', HttpStatus.BAD_REQUEST);
 
     const notificationType = await this.prisma.notificationType.findFirst({
@@ -49,24 +32,15 @@ export class NotificationsService {
     const notificationChannels = Object.keys(
       NotificationChannel,
     ) as NotificationChannel[];
-    for (const notificationChannel of notificationChannels) {
-      if (
-        notificationType.notificationChannels.includes(notificationChannel) &&
-        user.notificationChannels.includes(notificationChannel) &&
-        company.notificationChannels.includes(notificationChannel)
-      ) {
-        switch (notificationChannel) {
-          case NotificationChannel.EMAIL:
-            this.createEmailNotification(user);
-            break;
-          case NotificationChannel.UI:
-            await this.createUiNotification(user, company);
-            break;
 
-          default:
-            break;
-        }
-      }
+    for (const notificationChannel of notificationChannels) {
+      const notification = new NotificationFactory().create(
+        this.prisma,
+        user,
+        company,
+        notificationChannel,
+      );
+      await notification.send();
     }
   }
 
@@ -81,5 +55,73 @@ export class NotificationsService {
     return await this.prisma.uiNotification.findMany({
       where: { userId: id },
     });
+  }
+}
+
+abstract class AbstractNotification {
+  protected prisma: PrismaService;
+  protected user: User;
+  protected company: Company;
+  protected notificationChannel: NotificationChannel;
+
+  /** checks if notification should be sent */
+  check() {
+    return (
+      this.user.notificationChannels.includes(this.notificationChannel) &&
+      this.company.notificationChannels.includes(this.notificationChannel)
+    );
+  }
+
+  /** checks if notification should be sent and sends it */
+  send() {}
+
+  constructor(prisma: PrismaService, user: User, company: Company) {
+    this.prisma = prisma;
+    this.user = user;
+    this.company = company;
+  }
+}
+
+class NotificationFactory {
+  create(
+    prisma: PrismaService,
+    user: User,
+    company: Company,
+    notificationChannel: NotificationChannel,
+  ) {
+    switch (notificationChannel) {
+      case NotificationChannel.EMAIL:
+        return new EmailNotification(prisma, user, company);
+      case NotificationChannel.UI:
+        return new UiNotification(prisma, user, company);
+    }
+  }
+}
+
+class UiNotification extends AbstractNotification {
+  notificationChannel = NotificationChannel.UI;
+
+  async send() {
+    if (!this.check()) return;
+
+    const res = await this.prisma.uiNotification.create({
+      data: {
+        userId: this.user.id,
+        companyId: this.company.id,
+        subject: `Happy Birthday ${this.user.firstName}`,
+        content: `${this.company.companyName} is wishing you a happy birthday`,
+      },
+    });
+    return;
+  }
+}
+
+class EmailNotification extends AbstractNotification {
+  notificationChannel = NotificationChannel.EMAIL;
+
+  async send() {
+    if (!this.check()) return;
+
+    console.log(`Happy Birthday ${this.user.firstName}`);
   }
 }
