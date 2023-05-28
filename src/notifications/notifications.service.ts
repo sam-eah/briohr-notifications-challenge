@@ -30,11 +30,7 @@ export class NotificationsService {
         HttpStatus.BAD_REQUEST,
       );
 
-    const notificationChannels = Object.keys(
-      NotificationChannel,
-    ) as NotificationChannel[];
-
-    for (const notificationChannel of notificationChannels) {
+    for (const notificationChannel of notificationType.notificationChannels) {
       const notification = new NotificationFactory().create(
         this.prisma,
         user,
