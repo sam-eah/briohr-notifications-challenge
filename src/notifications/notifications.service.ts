@@ -41,7 +41,7 @@ export class NotificationsService {
         company,
         notificationChannel,
       );
-      await notification.send();
+      await notification.checkAndSend();
     }
   }
 

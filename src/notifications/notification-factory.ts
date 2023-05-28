@@ -10,11 +10,14 @@ interface INotification {
   /** checks if notification should be sent */
   check(): boolean;
 
-  /** checks if notification should be sent and sends it */
+  /** sends notifiaction */
   send(): Promise<void>;
+
+  /** checks if notification should be sent and sends it if it should */
+  checkAndSend(): Promise<void>;
 }
 
-abstract class AbstractNotification {
+abstract class AbstractNotification implements INotification {
   prisma: PrismaService;
   user: User;
   company: Company;
@@ -32,14 +35,20 @@ abstract class AbstractNotification {
       this.company.notificationChannels.includes(this.notificationChannel)
     );
   }
+
+  async send() {}
+
+  async checkAndSend() {
+    if (!this.check()) return;
+
+    await this.send();
+  }
 }
 
-class UiNotification extends AbstractNotification implements INotification {
+class UiNotification extends AbstractNotification {
   notificationChannel = NotificationChannel.UI;
 
   async send() {
-    if (!this.check()) return;
-
     const res = await this.prisma.uiNotification.create({
       data: {
         userId: this.user.id,
@@ -52,12 +61,10 @@ class UiNotification extends AbstractNotification implements INotification {
   }
 }
 
-class EmailNotification extends AbstractNotification implements INotification {
+class EmailNotification extends AbstractNotification {
   notificationChannel = NotificationChannel.EMAIL;
 
   async send() {
-    if (!this.check()) return;
-
     console.log(`Happy Birthday ${this.user.firstName}`);
   }
 }
