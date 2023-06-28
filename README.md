@@ -2,7 +2,7 @@
 
 ## Description
 
-My solution for the BrioHR challenge - The notification microservice
+A nestjs notification microservice
 
 ## Installation
 
